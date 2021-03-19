@@ -1,0 +1,6 @@
+[submodule "matplotlib-cpp"]
+	path = matplotlib-cpp
+	url = https://github.com/lava/matplotlib-cpp
+[submodule "extern/matplotlib-cpp"]
+	path = extern/matplotlib-cpp
+	url = https://github.com/lava/matplotlib-cpp
