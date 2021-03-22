@@ -4,3 +4,6 @@
 [submodule "extern/matplotlib-cpp"]
 	path = extern/matplotlib-cpp
 	url = https://github.com/lava/matplotlib-cpp
+[submodule "extern/eigen"]
+	path = extern/eigen
+	url = https://gitlab.com/libeigen/eigen
