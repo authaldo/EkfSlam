@@ -1,11 +1,74 @@
 #include <cfenv>
 #include <chrono>
 #include <iostream>
+#include <matplotlibcpp.h>
 #include <thread>
 
 #include "EkfSlamManager.hpp"
+#include "sim/CircularTrackSimParams.hpp"
+#include "sim/CircularTrackSimulator.hpp"
+
+template<typename T>
+std::pair<std::vector<T>, std::vector<T>> separateCoords(const std::vector<Coord<T>> &input) {
+    std::vector<T> coordsX, coordsY;
+    coordsX.reserve(input.size());
+    coordsY.reserve(input.size());
+
+    for (auto &[x, y] : input) {
+        coordsX.push_back(x);
+        coordsY.push_back(y);
+    }
+
+    return std::make_pair(coordsX, coordsY);
+}
 
 int main() {
+    namespace plt = matplotlibcpp;
+
+    CircularTrackSimParams params;
+    params.numConesPerCircle = 16;
+    params.innerRadius = 4.0f;
+    params.outerRadius = 8.0f;
+    params.deltaT = 0.1f;
+    params.historySize = 30;
+
+    sim::CircularTrackSimulator<float> sim(params);
+
+    auto [innerConesX, innerConesY] = separateCoords(sim.getInnerCones());
+    auto [outerConesX, outerConesY] = separateCoords(sim.getOuterCones());
+
+    constexpr float CONE_DRAW_SIZE = 10.0f;
+    constexpr float VEHICLE_DRAW_SIZE = 30.0f;
+
+    for (unsigned int i = 0; i < 1000; i++) {
+        sim.nextSimulationStep();
+
+        auto vehiclePose = sim.getCurrentVehiclePose();
+
+        auto [histX, histY] = separateCoords(sim.getPositionHistory());
+
+        // Visualization
+        plt::cla();
+
+        plt::title("EKF SLAM Simulation");
+
+        plt::scatter(std::vector<float>{vehiclePose.pos.x}, std::vector<float>{vehiclePose.pos.y}, VEHICLE_DRAW_SIZE, {{"c", "red"}});
+
+        plt::scatter(innerConesX, innerConesY, CONE_DRAW_SIZE, {{"c", "orange"}, {"marker", "^"}});
+        plt::scatter(outerConesX, outerConesY, CONE_DRAW_SIZE, {{"c", "blue"}, {"marker", "^"}});
+
+        plt::plot(histX, histY);
+
+        plt::draw();
+        plt::pause(0.5);
+
+        // do not reopen the figure if the user has closed it
+        if (!plt::fignum_exists(1)) {
+            break;
+        }
+    }
+
+    /*
     feenableexcept(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO); // Floating point exceptions
     auto dt = 0.1;
 
@@ -64,5 +127,5 @@ int main() {
 
         using namespace std::chrono_literals;
         std::this_thread::sleep_for(100ms);
-    }
+    }*/
 }
