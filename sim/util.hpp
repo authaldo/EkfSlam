@@ -21,6 +21,16 @@ struct Coord {
 
         return out;
     }
+
+    void operator+= (const Coord<T> &c1) {
+        x += c1.x;
+        y += c1.x;
+    }
+
+    void operator-= (const Coord<T> &c1) {
+        x -= c1.x;
+        y -= c1.y;
+    }
 };
 
 template<typename T>

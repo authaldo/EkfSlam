@@ -31,6 +31,8 @@ int main() {
     params.outerRadius = 8.0f;
     params.deltaT = 0.1f;
     params.historySize = 30;
+    params.fovAngle = 50;
+    params.fovRange = 5;
 
     sim::CircularTrackSimulator<float> sim(params);
 
@@ -47,20 +49,29 @@ int main() {
 
         auto [histX, histY] = separateCoords(sim.getPositionHistory());
 
+        auto [fovX, fovY] = separateCoords(sim.getCurrentFoVPolygon());
+
+        auto [visConesX, visConesY] = separateCoords(sim.getVisibleCones());
+
         // Visualization
-        plt::cla();
+        plt::clf();
+        plt::xlim(-10, 10);
+        plt::ylim(-10, 10);
 
         plt::title("EKF SLAM Simulation");
+
+        plt::plot(fovX, fovY, {{"c", "cyan"}});
 
         plt::scatter(std::vector<float>{vehiclePose.pos.x}, std::vector<float>{vehiclePose.pos.y}, VEHICLE_DRAW_SIZE, {{"c", "red"}});
 
         plt::scatter(innerConesX, innerConesY, CONE_DRAW_SIZE, {{"c", "orange"}, {"marker", "^"}});
         plt::scatter(outerConesX, outerConesY, CONE_DRAW_SIZE, {{"c", "blue"}, {"marker", "^"}});
+        plt::scatter(visConesX, visConesY, CONE_DRAW_SIZE, {{"c", "black"}, {"facecolors", "none"}, {"edgecolors", "black"}});
 
         plt::plot(histX, histY);
 
         plt::draw();
-        plt::pause(0.5);
+        plt::pause(0.1);
 
         // do not reopen the figure if the user has closed it
         if (!plt::fignum_exists(1)) {

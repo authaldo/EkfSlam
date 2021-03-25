@@ -16,6 +16,14 @@ struct CircularTrackSimParams {
 
     float deltaT = 1.0f;
     unsigned int historySize = 1;
+
+    float fovAngle = 10;
+    float fovRange = 10;
+
+    float coneMeasStddev = 0;
+    float coneDropProb = 0;
+
+    float vehicleMeasStddev = 0;
 };
 
 #endif // CIRCULAR_TRACK_SIM_PARAMS_HPP
